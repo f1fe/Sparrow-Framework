@@ -65,6 +65,8 @@
     BOOL _showStats;
 }
 
+@dynamic view;
+
 #pragma mark Initialization
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil

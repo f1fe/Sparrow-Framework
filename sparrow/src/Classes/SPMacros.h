@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import <math.h>
+#import <UIKit/NSText.h>
 
 // typedefs
 
@@ -42,9 +43,9 @@ enum { SPNotFound = -1 };
 // horizontal alignment
 typedef NS_ENUM(uint, SPHAlign)
 {
-    SPHAlignLeft,
-    SPHAlignCenter,
-    SPHAlignRight
+    SPHAlignLeft = NSTextAlignmentLeft,
+    SPHAlignCenter = NSTextAlignmentCenter,
+    SPHAlignRight = NSTextAlignmentRight
 };
 
 // vertical alignment

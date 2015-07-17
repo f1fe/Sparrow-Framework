@@ -40,7 +40,9 @@
     if ((self = [super init]))
     {
         NSString *fullPath = [SPUtils absolutePathToFile:path];
-        _soundData = [[NSData alloc] initWithContentsOfMappedFile:fullPath];
+        NSError *error = nil;
+        _soundData = [[NSData alloc] initWithContentsOfFile: fullPath options: NSDataReadingMappedIfSafe error: &error];
+        if (error) NSLog(@"Could not map sound file: %@", [error description]);
         _duration = duration;
     }
     return self;

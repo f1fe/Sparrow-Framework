@@ -15,6 +15,9 @@
 #import <OpenAL/al.h>
 #import <OpenAL/alc.h>
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVAudioSession.h>
+
+#define SP_DEFAULT_MASTER_VOLUME (1.0f)
 
 // --- notifications -------------------------------------------------------------------------------
 
@@ -25,6 +28,15 @@ NSString *const SPNotificationAudioInteruptionEnded     = @"SPNotificationAudioI
 // --- private interaface --------------------------------------------------------------------------
 
 @interface SPAudioEngine ()
+{
+    ALCdevice  *device;
+    ALCcontext *context;
+    SPAudioSessionCategory audioSessionCategory;
+    float masterVolume;
+    BOOL interrupted;
+}
+
++ (instancetype)defaultAudioEngine;
 
 + (BOOL)initAudioSession:(SPAudioSessionCategory)category;
 + (BOOL)initOpenAL;
@@ -33,6 +45,10 @@ NSString *const SPNotificationAudioInteruptionEnded     = @"SPNotificationAudioI
 + (void)endInterruption;
 + (void)onAppActivated:(NSNotification *)notification;
 + (void)postNotification:(NSString *)name object:(id)object;
+
++ (void)audioSessionInterrupted: (NSNotification *)notification;
++ (void)mediaServicesWereReset: (NSNotification *)notification;
+
 
 @end
 
@@ -43,84 +59,121 @@ NSString *const SPNotificationAudioInteruptionEnded     = @"SPNotificationAudioI
 
 // --- C functions ---
 
-static void interruptionCallback (void *inUserData, UInt32 interruptionState) 
-{   
-    if (interruptionState == kAudioSessionBeginInterruption)  
-        [SPAudioEngine beginInterruption]; 
-    else if (interruptionState == kAudioSessionEndInterruption)
-        [SPAudioEngine endInterruption];
-} 
-
-// --- static members ---
-
-static ALCdevice  *device  = NULL;
-static ALCcontext *context = NULL;
-static float masterVolume = 1.0f;
-static BOOL interrupted = NO;
+static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSessionCategory audioSessionCategory ) {
+    NSString * audioCategory = nil;
+    switch (audioSessionCategory) {
+        case SPAudioSessionCategory_AmbientSound:
+            audioCategory = AVAudioSessionCategoryAmbient;
+            break;
+        case SPAudioSessionCategory_SoloAmbientSound:
+            audioCategory = AVAudioSessionCategorySoloAmbient;
+            break;
+        case SPAudioSessionCategory_AudioProcessing:
+            audioCategory = AVAudioSessionCategoryAudioProcessing;
+            break;
+        case SPAudioSessionCategory_MediaPlayback:
+            audioCategory = AVAudioSessionCategoryPlayback;
+            break;
+        case SPAudioSessionCategory_PlayAndRecord:
+            audioCategory = AVAudioSessionCategoryPlayAndRecord;
+            break;
+        case SPAudioSessionCategory_RecordAudio:
+            audioCategory = AVAudioSessionCategoryRecord;
+            break;
+        default:
+            break;
+    }
+    return audioCategory;
+}
 
 #pragma mark Initialization
 
++ (instancetype)defaultAudioEngine
+{
+    static SPAudioEngine *audioEngine = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        audioEngine = [[SPAudioEngine alloc] init];
+    });
+    return audioEngine;
+}
+
 - (instancetype)init
 {
-    [NSException raise:NSGenericException format:@"Static class - do not initialize!"];        
-    return nil;
+    self = [super init];
+    if (self) {
+        masterVolume = SP_DEFAULT_MASTER_VOLUME;
+        audioSessionCategory = SPAudioSessionCategory_SoloAmbientSound;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [[self class] stop];
+    [super dealloc];
+}
+
++ (void)audioSessionInterrupted: (NSNotification *)notification
+{
+    NSDictionary *userInfo = [notification userInfo];
+    NSNumber *interruptionType = userInfo[AVAudioSessionInterruptionTypeKey];
+    if( interruptionType ) {
+        NSUInteger interruptionValue = [interruptionType unsignedIntegerValue];
+        if( interruptionValue == AVAudioSessionInterruptionTypeBegan ) {
+            [[self class] beginInterruption];
+        } else if( interruptionValue == AVAudioSessionInterruptionTypeEnded ) {
+            [[self class] endInterruption];
+        }
+    }
+}
+
++ (void)mediaServicesWereReset:(NSNotification *)notification
+{
+    [[self class] stop];
+    [[self class] start];
 }
 
 + (BOOL)initAudioSession:(SPAudioSessionCategory)category
 {
-    static BOOL sessionInitialized = NO;
-    OSStatus result;
-
-    if (!sessionInitialized)
-    {
-        result = AudioSessionInitialize(NULL, NULL, interruptionCallback, NULL);
-        if (result != kAudioSessionNoError)
-        {
-            NSLog(@"Could not initialize audio session: %x", (unsigned int)result);
-            return NO;
-        }
-        sessionInitialized = YES;
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    audioEngine -> audioSessionCategory = category;
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    NSError *audioError = nil;
+    BOOL success = [audioSession setCategory: audioSessionCategoryFromSPAudioSessionCategory(category)
+                                       error: &audioError];
+    if( audioError ) {
+        NSLog(@"Failed to initialize audio session:%@", [audioError localizedDescription] );
     }
-
-    UInt32 sessionCategory = category;
-    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
-                            sizeof(sessionCategory), &sessionCategory);
-
-    result = AudioSessionSetActive(YES);
-    if (result != kAudioSessionNoError)
-    {
-        NSLog(@"Could not activate audio session: %x", (unsigned int)result);
-        return NO;
-    }
-
-    return YES;
+    return success;
 }
 
 + (BOOL)initOpenAL
 {
     alGetError(); // reset any errors
 
-    device = alcOpenDevice(NULL);
-    if (!device)
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    audioEngine -> device = alcOpenDevice(NULL);
+    if (!(audioEngine -> device))
     {
         NSLog(@"Could not open default OpenAL device");
         return NO;
     }
-
-    context = alcCreateContext(device, 0);
-    if (!context)
+    
+    audioEngine -> context = alcCreateContext(audioEngine -> device, 0);
+    if (!(audioEngine -> context))
     {
         NSLog(@"Could not create OpenAL context for default device");
         return NO;
     }
-
-    BOOL success = alcMakeContextCurrent(context);
+    
+    BOOL success = alcMakeContextCurrent(audioEngine -> context);
     if (!success)
     {
         NSLog(@"Could not set current OpenAL context");
         return NO;
     }
-
+    
     return YES;
 }
 
@@ -128,48 +181,69 @@ static BOOL interrupted = NO;
 
 + (void)start:(SPAudioSessionCategory)category
 {
-    if (!device)
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    if (!(audioEngine -> device))
     {
         if ([SPAudioEngine initAudioSession:category])
             [SPAudioEngine initOpenAL];
+        
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter removeObserver:self];
+        [notificationCenter addObserver: self
+                               selector: @selector(audioSessionInterrupted:)
+                                   name: AVAudioSessionInterruptionNotification
+                                 object: audioSession];
+        [notificationCenter addObserver: self
+                               selector: @selector(mediaServicesWereReset:)
+                                   name: AVAudioSessionMediaServicesWereResetNotification
+                                 object: audioSession];
         
         // A bug introduced in iOS 4 may lead to 'endInterruption' NOT being called in some
         // situations. Thus, we're resuming the audio session manually via the 'DidBecomeActive'
         // notification. Find more information here: http://goo.gl/mr9KS
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAppActivated:)
-                                                     name:UIApplicationDidBecomeActiveNotification
-                                                   object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(onAppActivated:)
+                                   name:UIApplicationDidBecomeActiveNotification
+                                 object:nil];
     }
 }
 
 + (void)start
 {      
-    [SPAudioEngine start:SPAudioSessionCategory_SoloAmbientSound];
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    [SPAudioEngine start: audioEngine -> audioSessionCategory];
 }
 
 + (void)stop
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
     alcMakeContextCurrent(NULL);
-    alcDestroyContext(context);
-    alcCloseDevice(device);
-    AudioSessionSetActive(NO);
+    alcDestroyContext(audioEngine -> context);
+    alcCloseDevice(audioEngine -> device);
+    NSError *audioError = nil;
+    [[AVAudioSession sharedInstance] setActive: NO error: &audioError];
+    if( audioError ) {
+        NSLog(@"Could not stop audio:\n%@\n", [audioError localizedDescription] );
+    }
     
-    device = NULL;
-    context = NULL;
-    interrupted = NO;
+    audioEngine -> device = NULL;
+    audioEngine -> context = NULL;
+    audioEngine -> interrupted = NO;
 }
 
 + (float)masterVolume
 {
-    return masterVolume;
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    return audioEngine -> masterVolume;
 }
 
 + (void)setMasterVolume:(float)volume
 {       
-    masterVolume = volume;
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    audioEngine -> masterVolume = volume;
     alListenerf(AL_GAIN, volume);
     [SPAudioEngine postNotification:SPNotificationMasterVolumeChanged object:nil];
 }
@@ -180,22 +254,33 @@ static BOOL interrupted = NO;
 {
     [SPAudioEngine postNotification:SPNotificationAudioInteruptionBegan object:nil];
     alcMakeContextCurrent(NULL);
-    AudioSessionSetActive(NO);
-    interrupted = YES;
+    NSError *audioError = nil;
+    [[AVAudioSession sharedInstance] setActive: NO error: &audioError];
+    if( audioError ) {
+        NSLog(@"Could not stop audio:\n%@\n", [audioError localizedDescription] );
+    }
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    audioEngine -> interrupted = YES;
 }
 
 + (void)endInterruption
 {
-    interrupted = NO;
-    AudioSessionSetActive(YES);
-    alcMakeContextCurrent(context);
-    alcProcessContext(context);
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    audioEngine -> interrupted = NO;
+    NSError *audioError = nil;
+    [[AVAudioSession sharedInstance] setActive: YES error: &audioError];
+    if( audioError ) {
+        NSLog(@"Could not stop audio:\n%@\n", [audioError localizedDescription] );
+    }
+    alcMakeContextCurrent(audioEngine -> context);
+    alcProcessContext(audioEngine -> context);
     [SPAudioEngine postNotification:SPNotificationAudioInteruptionEnded object:nil];
 }
 
 + (void)onAppActivated:(NSNotification *)notification
 {
-    if (interrupted) [self endInterruption];
+    SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
+    if (audioEngine -> interrupted) [self endInterruption];
 }
 
 + (void)postNotification:(NSString *)name object:(id)object

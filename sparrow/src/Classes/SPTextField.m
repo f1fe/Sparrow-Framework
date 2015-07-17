@@ -53,6 +53,8 @@ static NSMutableDictionary *bitmapFonts = nil;
 {
     float _fontSize;
     uint _color;
+    NSMutableParagraphStyle *_paragraphStyle;
+    UIFont *_textFont;
     NSString *_text;
     NSString *_fontName;
     SPHAlign _hAlign;
@@ -74,7 +76,11 @@ static NSMutableDictionary *bitmapFonts = nil;
           fontSize:(float)size color:(uint)color 
 {
     if ((self = [super init]))
-    {        
+    {
+        _paragraphStyle = [NSMutableParagraphStyle new];
+        _paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        _paragraphStyle.alignment = SPHAlignCenter;
+        _textFont = [[UIFont fontWithName: name size: size] retain];
         _text = [text copy];
         _fontSize = size;
         _color = color;
@@ -121,6 +127,8 @@ static NSMutableDictionary *bitmapFonts = nil;
 
 - (void)dealloc
 {
+    [_paragraphStyle release];
+    [_textFont release];
     [_text release];
     [_fontName release];
     [_contents release];
@@ -248,7 +256,8 @@ static NSMutableDictionary *bitmapFonts = nil;
             [SPTextField registerBitmapFont:[[[SPBitmapFont alloc] initWithMiniFont] autorelease]];
 
         SP_RELEASE_AND_COPY(_fontName, fontName);
-        _requiresRedraw = YES;        
+        SP_RELEASE_AND_RETAIN( _textFont, [UIFont fontWithName: _fontName size: _fontSize]);
+        _requiresRedraw = YES;
         _isRenderedText = !bitmapFonts[_fontName];
     }
 }
@@ -258,6 +267,7 @@ static NSMutableDictionary *bitmapFonts = nil;
     if (fontSize != _fontSize)
     {
         _fontSize = fontSize;
+        SP_RELEASE_AND_RETAIN( _textFont, [UIFont fontWithName: _fontName size: _fontSize]);
         _requiresRedraw = YES;
     }
 }
@@ -267,6 +277,7 @@ static NSMutableDictionary *bitmapFonts = nil;
     if (hAlign != _hAlign)
     {
         _hAlign = hAlign;
+        _paragraphStyle.alignment = (NSTextAlignment)_hAlign;
         _requiresRedraw = YES;
     }
 }
@@ -360,14 +371,8 @@ static NSMutableDictionary *bitmapFonts = nil;
     float height = _hitArea.height;    
     float fontSize = _fontSize == SPNativeFontSize ? SPDefaultFontSize : _fontSize;
     
-  #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
-    NSLineBreakMode lbm = NSLineBreakByTruncatingTail;
-  #else
-    UILineBreakMode lbm = UILineBreakModeTailTruncation;
-  #endif
-
     CGSize textSize;
-    
+    NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString: _text attributes: @{ NSParagraphStyleAttributeName : _paragraphStyle, NSFontAttributeName: _textFont }];
     if (_autoScale)
     {
         CGSize maxSize = CGSizeMake(width, FLT_MAX);
@@ -376,14 +381,16 @@ static NSMutableDictionary *bitmapFonts = nil;
         do
         {
             fontSize -= 1.0f;
-            textSize = [_text sizeWithFont:[UIFont fontWithName:_fontName size:fontSize]
-                         constrainedToSize:maxSize lineBreakMode:lbm];
+            textSize = [attributedText boundingRectWithSize: maxSize
+                                                    options: NSStringDrawingUsesLineFragmentOrigin
+                                                    context: nil].size;
         } while (textSize.height > height);
     }
     else
     {
-        textSize = [_text sizeWithFont:[UIFont fontWithName:_fontName size:fontSize]
-                     constrainedToSize:CGSizeMake(width, height) lineBreakMode:lbm];
+        textSize = [attributedText boundingRectWithSize: CGSizeMake(width, height)
+                                                options: NSStringDrawingUsesLineFragmentOrigin
+                                                context: nil].size;
     }
     
     float xOffset = 0;
@@ -406,9 +413,7 @@ static NSMutableDictionary *bitmapFonts = nil;
           
           CGContextSetRGBFillColor(context, red, green, blue, 1.0f);
           
-          [_text drawInRect:CGRectMake(0, yOffset, width, height)
-                   withFont:[UIFont fontWithName:_fontName size:fontSize] 
-              lineBreakMode:lbm alignment:(NSTextAlignment)_hAlign];
+          [attributedText drawInRect: CGRectMake(0, yOffset, width, height)];
       }];
     
     SPImage *image = [[SPImage alloc] initWithTexture:texture];
@@ -416,6 +421,7 @@ static NSMutableDictionary *bitmapFonts = nil;
 
     [_contents addQuad:image];
     [image release];
+    [attributedText release];
 }
 
 - (void)createComposedContents
