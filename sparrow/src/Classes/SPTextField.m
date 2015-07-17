@@ -372,7 +372,11 @@ static NSMutableDictionary *bitmapFonts = nil;
     float fontSize = _fontSize == SPNativeFontSize ? SPDefaultFontSize : _fontSize;
     
     CGSize textSize;
-    NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString: _text attributes: @{ NSParagraphStyleAttributeName : _paragraphStyle, NSFontAttributeName: _textFont }];
+    NSAttributedString *attributedText = [[NSAttributedString alloc] initWithString: _text
+                                                                         attributes: @{
+                                                                            NSParagraphStyleAttributeName : _paragraphStyle,
+                                                                            NSFontAttributeName: _textFont
+                                                                            }];
     if (_autoScale)
     {
         CGSize maxSize = CGSizeMake(width, FLT_MAX);
