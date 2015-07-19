@@ -40,6 +40,7 @@ static NSMutableDictionary *framebufferCache = nil;
     if ((self = [super init]))
     {
         _nativeContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:sharegroup];
+        _nativeContext.multiThreaded = YES;
         _glStateCache = sglStateCacheCreate();
     }
     return self;

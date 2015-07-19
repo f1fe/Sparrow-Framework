@@ -51,6 +51,7 @@
         if (scale <= 0.0f)  [NSException raise:SPExceptionInvalidOperation format:@"invalid scale"];
         
         _name = name;
+        _format = format;
         _width = width;
         _height = height;
         _mipmaps = mipmaps;
