@@ -18,7 +18,7 @@
 // EXPERIMENTAL FEATURE: Activate the OpenGL state cache here!
 // -----------------------------------------------------------
 
-#define SP_ENABLE_GL_STATE_CACHE 0
+#define SP_ENABLE_GL_STATE_CACHE 1
 
 /// Sparrow's OpenGL state cache reference type.
 typedef struct SGLStateCache *SGLStateCacheRef;

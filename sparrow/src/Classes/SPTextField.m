@@ -29,7 +29,7 @@
 
 NSString *const   SPDefaultFontName   = @"Helvetica";
 const float       SPDefaultFontSize   = 14.0f;
-const uint        SPDefaultFontColor  = 0x0;
+const uint        SPDefaultFontColor  = 0xffffffff;
 const float       SPNativeFontSize    = -1;
 
 // --- bitmap font cache ---------------------------------------------------------------------------

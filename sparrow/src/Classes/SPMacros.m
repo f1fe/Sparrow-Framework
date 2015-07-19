@@ -11,22 +11,22 @@
 
 #import <Sparrow/SPMacros.h>
 
-const uint SPColorWhite     = 0xffffff;
-const uint SPColorSilver    = 0xc0c0c0;
-const uint SPColorGray      = 0x808080;
-const uint SPColorBlack     = 0x000000;
-const uint SPColorRed       = 0xff0000;
-const uint SPColorMaroon    = 0x800000;
-const uint SPColorYellow    = 0xffff00;
-const uint SPColorOlive     = 0x808000;
-const uint SPColorLime      = 0x00ff00;
-const uint SPColorGreen     = 0x008000;
-const uint SPColorAqua      = 0x00ffff;
-const uint SPColorTeal      = 0x008080;
-const uint SPColorBlue      = 0x0000ff;
-const uint SPColorNavy      = 0x000080;
-const uint SPColorFuchsia   = 0xff00ff;
-const uint SPColorPurple    = 0x800080;
+const uint SPColorWhite     = 0xffffffff;
+const uint SPColorSilver    = 0xffc0c0c0;
+const uint SPColorGray      = 0xff808080;
+const uint SPColorBlack     = 0xff000000;
+const uint SPColorRed       = 0xffff0000;
+const uint SPColorMaroon    = 0xff800000;
+const uint SPColorYellow    = 0xffffff00;
+const uint SPColorOlive     = 0xff808000;
+const uint SPColorLime      = 0xff00ff00;
+const uint SPColorGreen     = 0xff008000;
+const uint SPColorAqua      = 0xff00ffff;
+const uint SPColorTeal      = 0xff008080;
+const uint SPColorBlue      = 0xff0000ff;
+const uint SPColorNavy      = 0xff000080;
+const uint SPColorFuchsia   = 0xffff00ff;
+const uint SPColorPurple    = 0xff800080;
 
 NSString *const SPExceptionAbstractClass        = @"SPExceptionAbstractClass";
 NSString *const SPExceptionAbstractMethod       = @"SPExceptionAbstractMethod";
