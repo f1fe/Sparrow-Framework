@@ -15,6 +15,7 @@
 SP_EXTERN NSString *const SPNotificationMasterVolumeChanged;
 SP_EXTERN NSString *const SPNotificationAudioInteruptionBegan;
 SP_EXTERN NSString *const SPNotificationAudioInteruptionEnded;
+SP_EXTERN NSString *const SPNotificationMediaServicesWereReset;
 
 typedef NS_ENUM(UInt32, SPAudioSessionCategory) {
     SPAudioSessionCategory_AmbientSound     = 'ambi',

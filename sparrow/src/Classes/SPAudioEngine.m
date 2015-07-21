@@ -24,6 +24,8 @@
 NSString *const SPNotificationMasterVolumeChanged       = @"SPNotificationMasterVolumeChanged";
 NSString *const SPNotificationAudioInteruptionBegan     = @"SPNotificationAudioInteruptionBegan";
 NSString *const SPNotificationAudioInteruptionEnded     = @"SPNotificationAudioInteruptionEnded";
+NSString *const SPNotificationMediaServicesWereReset    = @"SPNotificationMediaServicesWereReset";
+
 
 // --- private interaface --------------------------------------------------------------------------
 
@@ -132,6 +134,7 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
 {
     [[self class] stop];
     [[self class] start];
+    [[self class] postNotification: SPNotificationMediaServicesWereReset object: nil];
 }
 
 + (BOOL)initAudioSession:(SPAudioSessionCategory)category
@@ -184,8 +187,8 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
     SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
     if (!(audioEngine -> device))
     {
-        if ([SPAudioEngine initAudioSession:category])
-            [SPAudioEngine initOpenAL];
+        if ([[self class] initAudioSession:category])
+            [[self class] initOpenAL];
         
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -213,7 +216,7 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
 + (void)start
 {      
     SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
-    [SPAudioEngine start: audioEngine -> audioSessionCategory];
+    [[self class] start: audioEngine -> audioSessionCategory];
 }
 
 + (void)stop
@@ -245,14 +248,14 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
     SPAudioEngine *audioEngine = [[self class] defaultAudioEngine];
     audioEngine -> masterVolume = volume;
     alListenerf(AL_GAIN, volume);
-    [SPAudioEngine postNotification:SPNotificationMasterVolumeChanged object:nil];
+    [[self class] postNotification:SPNotificationMasterVolumeChanged object:nil];
 }
 
 #pragma mark Notifications
 
 + (void)beginInterruption
 {
-    [SPAudioEngine postNotification:SPNotificationAudioInteruptionBegan object:nil];
+    [[self class] postNotification:SPNotificationAudioInteruptionBegan object:nil];
     alcMakeContextCurrent(NULL);
     NSError *audioError = nil;
     [[AVAudioSession sharedInstance] setActive: NO error: &audioError];
@@ -274,7 +277,7 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
     }
     alcMakeContextCurrent(audioEngine -> context);
     alcProcessContext(audioEngine -> context);
-    [SPAudioEngine postNotification:SPNotificationAudioInteruptionEnded object:nil];
+    [[self class] postNotification:SPNotificationAudioInteruptionEnded object:nil];
 }
 
 + (void)onAppActivated:(NSNotification *)notification
