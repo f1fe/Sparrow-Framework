@@ -182,7 +182,4 @@ SP_EXTERN SPVertexColor SPVertexColorMakeWithColorAndAlpha(uint rgb, float alpha
 /// this property, all color data will be updated accordingly.
 @property (nonatomic, assign) BOOL premultipliedAlpha;
 
-/// Indicates if any vertices have a non-white color or are not fully opaque.
-@property (nonatomic, readonly) BOOL tinted;
-
 @end

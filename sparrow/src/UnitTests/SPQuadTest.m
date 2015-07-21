@@ -81,23 +81,4 @@
     XCTAssertEqual(0.8f, [quad alphaOfVertex:3], @"wrong vertex alpha");
 }
 
-- (void)testTinted
-{
-    SPQuad *quad = [SPQuad quadWithWidth:100 height:100];
-    XCTAssertFalse(quad.tinted, @"default quad shouldn't be tinted");
-
-    quad.alpha = 0.99f;
-    XCTAssertTrue(quad.tinted, @"non-opaque quad should be tinted");
-
-    quad.alpha = 1.0f;
-    [quad setColor:0xff0000 ofVertex:0];
-    XCTAssertTrue(quad.tinted, @"partially colored quad should be tinted");
-
-    [quad setColor:0xffffff ofVertex:0];
-    XCTAssertFalse(quad.tinted, @"reset quad shouldn't be tinted");
-
-    [quad setAlpha:0.99f ofVertex:0];
-    XCTAssertTrue(quad.tinted, @"partially non-opaque quad should be tinted");
-}
-
 @end

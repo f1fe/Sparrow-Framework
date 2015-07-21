@@ -433,12 +433,4 @@ BOOL isOpaqueWhite(SPVertexColor color)
     _premultipliedAlpha = value;
 }
 
-- (BOOL)tinted
-{
-    for (int i=0; i<_numVertices; ++i)
-        if (!isOpaqueWhite(_vertices[i].color)) return YES;
-
-    return NO;
-}
-
 @end
