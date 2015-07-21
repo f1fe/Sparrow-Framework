@@ -42,7 +42,6 @@
     
     SPTexture *_texture;
     BOOL _premultipliedAlpha;
-    BOOL _tinted;
     
     SPBaseEffect *_baseEffect;
     SPVertexData *_vertexData;
@@ -134,11 +133,8 @@
     [quad copyVertexDataTo:_vertexData atIndex:vertexID];
     [_vertexData transformVerticesWithMatrix:matrix atIndex:vertexID numVertices:4];
     
-    if (alpha != 1.0f)
+    if (SPIsFloatNotEqual(alpha,1.0f))
         [_vertexData scaleAlphaBy:alpha atIndex:vertexID numVertices:4];
-    
-    if (!_tinted)
-        _tinted = alpha != 1.0f || quad.tinted;
     
     _syncRequired = YES;
     _numQuads++;
@@ -179,27 +175,22 @@
     [quadBatch->_vertexData copyToVertexData:_vertexData atIndex:vertexID numVertices:numVertices];
     [_vertexData transformVerticesWithMatrix:matrix atIndex:vertexID numVertices:numVertices];
     
-    if (alpha != 1.0f)
+    if (SPIsFloatNotEqual(alpha,1.0f))
         [_vertexData scaleAlphaBy:alpha atIndex:vertexID numVertices:numVertices];
-    
-    if (!_tinted)
-        _tinted = alpha != 1.0f || quadBatch.tinted;
     
     _syncRequired = YES;
     _numQuads += numQuads;
 }
 
-- (BOOL)isStateChangeWithTinted:(BOOL)tinted texture:(SPTexture *)texture alpha:(float)alpha
-             premultipliedAlpha:(BOOL)pma blendMode:(uint)blendMode numQuads:(int)numQuads
+- (BOOL)isStateChangeWithTexture:(SPTexture *)texture premultipliedAlpha:(BOOL)pma
+                   blendMode:(uint)blendMode numQuads:(int)numQuads
 {
     if (_numQuads == 0) return NO;
     else if (_numQuads + numQuads > 8192) return YES; // maximum buffer size
     else if (!_texture && !texture)
         return _premultipliedAlpha != pma || self.blendMode != blendMode;
     else if (_texture && texture)
-        return _tinted != (tinted || alpha != 1.0f) ||
-               _texture.name != texture.name ||
-               self.blendMode != blendMode;
+        return _texture.name != texture.name || self.blendMode != blendMode;
     else return YES;
 }
 
@@ -235,7 +226,6 @@
     _baseEffect.texture = _texture;
     _baseEffect.premultipliedAlpha = _premultipliedAlpha;
     _baseEffect.mvpMatrix = matrix;
-    _baseEffect.useTinting = _tinted || alpha != 1.0f;
     _baseEffect.alpha = alpha;
     
     [_baseEffect prepareToDraw];
@@ -332,14 +322,13 @@
     else if (quad || batch)
     {
         SPTexture *texture = [(id)object texture];
-        BOOL tinted = [(id)object tinted];
         BOOL pma = [(id)object premultipliedAlpha];
         int numQuads = batch ? batch.numQuads : 1;
         
         SPQuadBatch *currentBatch = quadBatches[quadBatchID];
         
-        if ([currentBatch isStateChangeWithTinted:tinted texture:texture alpha:alpha * objectAlpha
-                               premultipliedAlpha:pma blendMode:blendMode numQuads:numQuads])
+        if ([currentBatch isStateChangeWithTexture:texture premultipliedAlpha:pma
+                                         blendMode:blendMode numQuads:numQuads])
         {
             quadBatchID++;
             if (quadBatches.count <= quadBatchID) [quadBatches addObject:[SPQuadBatch quadBatch]];

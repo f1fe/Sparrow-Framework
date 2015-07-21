@@ -112,16 +112,16 @@
     [sprite addChild:quad1];
     [sprite addChild:quad2];
     
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(55.0f, sprite.width), @"wrong width: %f", sprite.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(65.0f, sprite.height), @"wrong height: %f", sprite.height);
+    XCTAssertTrue(SPIsFloatEqual(55.0f, sprite.width), @"wrong width: %f", sprite.width);
+    XCTAssertTrue(SPIsFloatEqual(65.0f, sprite.height), @"wrong height: %f", sprite.height);
     
     quad1.rotation = PI_HALF;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(75.0f, sprite.width), @"wrong width: %f", sprite.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(65.0f, sprite.height), @"wrong height: %f", sprite.height);
+    XCTAssertTrue(SPIsFloatEqual(75.0f, sprite.width), @"wrong width: %f", sprite.width);
+    XCTAssertTrue(SPIsFloatEqual(65.0f, sprite.height), @"wrong height: %f", sprite.height);
     
     quad1.rotation = PI;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(65.0f, sprite.width), @"wrong width: %f", sprite.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(85.0f, sprite.height), @"wrong height: %f", sprite.height);
+    XCTAssertTrue(SPIsFloatEqual(65.0f, sprite.width), @"wrong width: %f", sprite.width);
+    XCTAssertTrue(SPIsFloatEqual(85.0f, sprite.height), @"wrong height: %f", sprite.height);
 }
 
 - (void)testBounds
@@ -135,16 +135,16 @@
     [sprite addChild:quad];
     
     SPRectangle *bounds = [sprite bounds];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.height), @"wrong bounds.height: %f", bounds.height);    
+    XCTAssertTrue(SPIsFloatEqual(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
+    XCTAssertTrue(SPIsFloatEqual(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.height), @"wrong bounds.height: %f", bounds.height);    
     
     bounds = [sprite boundsInSpace:sprite];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.height), @"wrong bounds.height: %f", bounds.height); 
+    XCTAssertTrue(SPIsFloatEqual(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
+    XCTAssertTrue(SPIsFloatEqual(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.height), @"wrong bounds.height: %f", bounds.height); 
 }
 
 - (void)testBoundsInSpace

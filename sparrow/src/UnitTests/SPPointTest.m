@@ -44,7 +44,7 @@
 - (void)testLength
 {
     SPPoint *point = [[SPPoint alloc] initWithX:-4 y:3];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(5.0f, point.length), @"wrong length");
+    XCTAssertTrue(SPIsFloatEqual(5.0f, point.length), @"wrong length");
     point.x = 0;
     point.y = 0;
     XCTAssertEqual(0.0f, point.length, @"wrong length");
@@ -59,35 +59,35 @@
 - (void)testAngle
 {    
     SPPoint *point = [[SPPoint alloc] initWithX:10 y:0];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(0.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(0.0f, point.angle), @"wrong angle: %f", point.angle);
     point.y = 10;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
     point.x = 0;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(PI/2.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(PI/2.0f, point.angle), @"wrong angle: %f", point.angle);
     point.x = -10;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(3*PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(3*PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
     point.y = 0;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(PI, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(PI, point.angle), @"wrong angle: %f", point.angle);
     point.y = -10;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-3*PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(-3*PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
     point.x = 0;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-PI/2.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(-PI/2.0f, point.angle), @"wrong angle: %f", point.angle);
     point.x = 10;
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
+    XCTAssertTrue(SPIsFloatEqual(-PI/4.0f, point.angle), @"wrong angle: %f", point.angle);
 }
 
 - (void)testAddPoint
 {
     SPPoint *result = [_p1 addPoint:_p2];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(6.0f, result.x), @"wrong x value");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(4.0f, result.y), @"wrong y value");
+    XCTAssertTrue(SPIsFloatEqual(6.0f, result.x), @"wrong x value");
+    XCTAssertTrue(SPIsFloatEqual(4.0f, result.y), @"wrong y value");
 }
 
 - (void)testSubtractPoint
 {
     SPPoint *result = [_p1 subtractPoint:_p2];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-2.0f, result.x), @"wrong x value");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(2.0f, result.y), @"wrong y value");
+    XCTAssertTrue(SPIsFloatEqual(-2.0f, result.x), @"wrong x value");
+    XCTAssertTrue(SPIsFloatEqual(2.0f, result.y), @"wrong y value");
 }
 
 - (void)testScale
@@ -109,8 +109,8 @@
 - (void)testNormalize
 {
     SPPoint *result = [_p1 normalize];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(1.0f, result.length), @"wrong length");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(_p1.angle, result.angle), @"wrong angle");
+    XCTAssertTrue(SPIsFloatEqual(1.0f, result.length), @"wrong length");
+    XCTAssertTrue(SPIsFloatEqual(_p1.angle, result.angle), @"wrong angle");
     SPPoint *origin = [[SPPoint alloc] init];
     result  = [origin normalize];
     XCTAssertEqualWithAccuracy(result.length, 1.0f, E, @"wrong length");
@@ -177,10 +177,10 @@
     SPPoint *p3 = [[SPPoint alloc] initWithX:5 y:0];
     SPPoint *p4 = [[SPPoint alloc] initWithX:5 y:5];
     float distance = [SPPoint distanceFromPoint:p3 toPoint:p4];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(5.0f, distance), @"wrong distance");
+    XCTAssertTrue(SPIsFloatEqual(5.0f, distance), @"wrong distance");
     p3.y = -5;
     distance = [SPPoint distanceFromPoint:p3 toPoint:p4];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10.0f, distance), @"wrong distance");
+    XCTAssertTrue(SPIsFloatEqual(10.0f, distance), @"wrong distance");
 }
 
 - (void)testAngleBetweenPoints
@@ -201,10 +201,10 @@
     float negAngle = -(2*PI - angle);
     float length = 2.0f;
     SPPoint *p3 = [SPPoint pointWithPolarLength:length angle:angle];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(length, p3.length), @"wrong length");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(negAngle, p3.angle), @"wrong angle");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-cosf(angle-PI)*length, p3.x), @"wrong x");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-sinf(angle-PI)*length, p3.y), @"wrong y");    
+    XCTAssertTrue(SPIsFloatEqual(length, p3.length), @"wrong length");
+    XCTAssertTrue(SPIsFloatEqual(negAngle, p3.angle), @"wrong angle");
+    XCTAssertTrue(SPIsFloatEqual(-cosf(angle-PI)*length, p3.x), @"wrong x");
+    XCTAssertTrue(SPIsFloatEqual(-sinf(angle-PI)*length, p3.y), @"wrong y");    
 }
 
 - (void)testInterpolate

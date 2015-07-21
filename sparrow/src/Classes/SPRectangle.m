@@ -147,8 +147,8 @@
     else
     {
         SPRectangle *rect = (SPRectangle *)other;
-        return SP_IS_FLOAT_EQUAL(_x, rect->_x) && SP_IS_FLOAT_EQUAL(_y, rect->_y) &&
-               SP_IS_FLOAT_EQUAL(_width, rect->_width) && SP_IS_FLOAT_EQUAL(_height, rect->_height);
+        return SPIsFloatEqual(_x, rect->_x) && SPIsFloatEqual(_y, rect->_y) &&
+               SPIsFloatEqual(_width, rect->_width) && SPIsFloatEqual(_height, rect->_height);
     }
 }
 

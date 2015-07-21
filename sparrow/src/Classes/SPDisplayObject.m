@@ -336,7 +336,7 @@
 
 - (float)scale
 {
-    if (!SP_IS_FLOAT_EQUAL(_scaleX, _scaleY))
+    if (!SPIsFloatEqual(_scaleX, _scaleY))
         NSLog(@"WARNING: Scale is not uniform. Use the approriate scaleX and scaleY properties.");
 
     return _scaleX;
@@ -556,7 +556,7 @@
     _scaleX = (_skewY > -PI_Q && _skewY < PI_Q) ?  matrix.a / cosf(_skewY)
                                                 :  matrix.b / sinf(_skewY);
 
-    if (SP_IS_FLOAT_EQUAL(_skewX, _skewY))
+    if (SPIsFloatEqual(_skewX, _skewY))
     {
         _rotation = _skewX;
         _skewX = _skewY = 0.0f;

@@ -217,7 +217,7 @@ BOOL isOpaqueWhite(SPVertexColor color)
 
     SPVertexColor vertexColor = _vertices[index].color;
     if (_premultipliedAlpha) vertexColor = unmultiplyAlpha(vertexColor);
-    return SP_COLOR(vertexColor.r, vertexColor.g, vertexColor.b);
+    return SPColorMake(vertexColor.r, vertexColor.g, vertexColor.b);
 }
 
 - (void)setColor:(uint)color atIndex:(int)index

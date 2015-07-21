@@ -79,8 +79,8 @@
     [identMatrix translateXBy:5 yBy:7];
     SPPoint *point = [[SPPoint alloc] initWithX:10 y:20];
     SPPoint *tPoint = [identMatrix transformPoint:point];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(15, tPoint.x), @"wrong x value: %f", tPoint.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(27, tPoint.y), @"wrong y value: %f", tPoint.y);    
+    XCTAssertTrue(SPIsFloatEqual(15, tPoint.x), @"wrong x value: %f", tPoint.x);
+    XCTAssertTrue(SPIsFloatEqual(27, tPoint.y), @"wrong y value: %f", tPoint.y);    
 }
 
 - (void)testRotate
@@ -88,15 +88,15 @@
     [identMatrix rotateBy:PI/2.0f];
     SPPoint *point = [[SPPoint alloc] initWithX:10 y:0];
     SPPoint *rPoint = [identMatrix transformPoint:point];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(0, rPoint.x), @"wrong x value: %f", rPoint.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, rPoint.y), @"wrong y value: %f", rPoint.y);
+    XCTAssertTrue(SPIsFloatEqual(0, rPoint.x), @"wrong x value: %f", rPoint.x);
+    XCTAssertTrue(SPIsFloatEqual(10, rPoint.y), @"wrong y value: %f", rPoint.y);
     
     [identMatrix identity];
     [identMatrix rotateBy:PI];
     point.y = 20;
     rPoint = [identMatrix transformPoint:point];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-10, rPoint.x), @"wrong x value: %f", rPoint.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-20, rPoint.y), @"wrong y value: %f", rPoint.y);
+    XCTAssertTrue(SPIsFloatEqual(-10, rPoint.x), @"wrong x value: %f", rPoint.x);
+    XCTAssertTrue(SPIsFloatEqual(-20, rPoint.y), @"wrong y value: %f", rPoint.y);
 }
 
 - (void)testScale
@@ -104,8 +104,8 @@
     [identMatrix scaleXBy:2.0 yBy:0.5];
     SPPoint *point = [[SPPoint alloc] initWithX:10 y:20];
     SPPoint *sPoint = [identMatrix transformPoint:point];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(20.0f, sPoint.x), @"wrong x value: %f", sPoint.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10.0f, sPoint.y), @"wrong y value: %f", sPoint.y);    
+    XCTAssertTrue(SPIsFloatEqual(20.0f, sPoint.x), @"wrong x value: %f", sPoint.x);
+    XCTAssertTrue(SPIsFloatEqual(10.0f, sPoint.y), @"wrong y value: %f", sPoint.y);    
 }
 
 - (void)testConcatenatedTransformations
@@ -114,16 +114,16 @@
     [identMatrix scaleBy:0.5f];
     [identMatrix translateXBy:0.0f yBy:5.0];
     SPPoint *ctPoint = [identMatrix transformPointWithX:10 y:0];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(0.0f, ctPoint.x), @"wrong x value: %f", ctPoint.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10.0f, ctPoint.y), @"wrong y value: %f", ctPoint.y);    
+    XCTAssertTrue(SPIsFloatEqual(0.0f, ctPoint.x), @"wrong x value: %f", ctPoint.x);
+    XCTAssertTrue(SPIsFloatEqual(10.0f, ctPoint.y), @"wrong y value: %f", ctPoint.y);    
 }
 
 - (BOOL)checkMatrixValues:(SPMatrix *)matrix a:(float)a b:(float)b c:(float)c d:(float)d 
                        tx:(float)tx ty:(float)ty
 {
-    return SP_IS_FLOAT_EQUAL(a, matrix.a) && SP_IS_FLOAT_EQUAL(b, matrix.b) &&
-           SP_IS_FLOAT_EQUAL(b, matrix.b) && SP_IS_FLOAT_EQUAL(c, matrix.c) &&
-           SP_IS_FLOAT_EQUAL(tx, matrix.tx) && SP_IS_FLOAT_EQUAL(ty, matrix.ty);
+    return SPIsFloatEqual(a, matrix.a) && SPIsFloatEqual(b, matrix.b) &&
+           SPIsFloatEqual(b, matrix.b) && SPIsFloatEqual(c, matrix.c) &&
+           SPIsFloatEqual(tx, matrix.tx) && SPIsFloatEqual(ty, matrix.ty);
 }
 
 @end

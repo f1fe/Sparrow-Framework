@@ -17,26 +17,12 @@
 #import <Sparrow/SPProgram.h>
 #import <Sparrow/SPTexture.h>
 
-static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
-{
-    if (hasTexture)
-    {
-        if (useTinting) return @"SPQuad#11";
-        else            return @"SPQuad#10";
-    }
-    else
-    {
-        if (useTinting) return @"SPQuad#01";
-        else            return @"SPQuad#00";
-    }
-}
-
 // --- private interface ---------------------------------------------------------------------------
 
 @interface SPBaseEffect ()
 
-- (NSString *)vertexShaderForTexture:(SPTexture *)texture useTinting:(BOOL)useTinting;
-- (NSString *)fragmentShaderForTexture:(SPTexture *)texture useTinting:(BOOL)useTinting;
+- (NSString *)vertexShaderForTexture:(SPTexture *)texture;
+- (NSString *)fragmentShaderForTexture:(SPTexture *)texture;
 
 @end
 
@@ -48,7 +34,6 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     SPMatrix  *_mvpMatrix;
     SPTexture *_texture;
     float _alpha;
-    BOOL _useTinting;
     BOOL _premultipliedAlpha;
     
     SPProgram *_program;
@@ -71,7 +56,6 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     {
         _mvpMatrix = [[SPMatrix alloc] init];
         _premultipliedAlpha = NO;
-        _useTinting = YES;
         _alpha = 1.0f;
     }
     return self;
@@ -90,17 +74,17 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
 - (void)prepareToDraw
 {
     BOOL hasTexture = _texture != nil;
-    BOOL useTinting = _useTinting || !_texture || _alpha != 1.0f;
 
     if (!_program)
     {
-        NSString *programName = getProgramName(hasTexture, useTinting);
+        NSString *programName = hasTexture ? @"SPQuad#11" : @"SPQuad#01";
+
         _program = [[Sparrow.currentController programByName:programName] retain];
         
         if (!_program)
         {
-            NSString *vertexShader   = [self vertexShaderForTexture:_texture   useTinting:useTinting];
-            NSString *fragmentShader = [self fragmentShaderForTexture:_texture useTinting:useTinting];
+            NSString *vertexShader   = [self vertexShaderForTexture:_texture];
+            NSString *fragmentShader = [self fragmentShaderForTexture:_texture];
             _program = [[SPProgram alloc] initWithVertexShader:vertexShader fragmentShader:fragmentShader];
             [Sparrow.currentController registerProgram:_program name:programName];
         }
@@ -117,11 +101,8 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     glUseProgram(_program.name);
     glUniformMatrix4fv(_uMvpMatrix, 1, NO, glkMvpMatrix.m);
     
-    if (useTinting)
-    {
-        if (_premultipliedAlpha) glUniform4f(_uAlpha, _alpha, _alpha, _alpha, _alpha);
-        else                     glUniform4f(_uAlpha, 1.0f, 1.0f, 1.0f, _alpha);
-    }
+    if (_premultipliedAlpha) glUniform4f(_uAlpha, _alpha, _alpha, _alpha, _alpha);
+    else                     glUniform4f(_uAlpha, 1.0f, 1.0f, 1.0f, _alpha);
     
     if (hasTexture)
     {
@@ -145,15 +126,6 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     _alpha = value;
 }
 
-- (void)setUseTinting:(BOOL)value
-{
-    if (value != _useTinting)
-    {
-        _useTinting = value;
-        SP_RELEASE_AND_NIL(_program);
-    }
-}
-
 - (void)setTexture:(SPTexture *)value
 {
     if ((_texture && !value) || (!_texture && value))
@@ -164,7 +136,7 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
 
 #pragma mark Private
 
-- (NSString *)vertexShaderForTexture:(SPTexture *)texture useTinting:(BOOL)useTinting
+- (NSString *)vertexShaderForTexture:(SPTexture *)texture
 {
     BOOL hasTexture = texture != nil;
     NSMutableString *source = [NSMutableString string];
@@ -172,13 +144,13 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     // variables
     
     [source appendLine:@"attribute vec4 aPosition;"];
-    if (useTinting) [source appendLine:@"attribute vec4 aColor;"];
+    [source appendLine:@"attribute vec4 aColor;"];
     if (hasTexture) [source appendLine:@"attribute vec2 aTexCoords;"];
 
     [source appendLine:@"uniform mat4 uMvpMatrix;"];
-    if (useTinting) [source appendLine:@"uniform vec4 uAlpha;"];
+    [source appendLine:@"uniform vec4 uAlpha;"];
     
-    if (useTinting) [source appendLine:@"varying lowp vec4 vColor;"];
+    [source appendLine:@"varying lowp vec4 vColor;"];
     if (hasTexture) [source appendLine:@"varying lowp vec2 vTexCoords;"];
     
     // main
@@ -186,7 +158,7 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     [source appendLine:@"void main() {"];
     
     [source appendLine:@"  gl_Position = uMvpMatrix * aPosition;"];
-    if (useTinting) [source appendLine:@"  vColor = aColor * uAlpha;"];
+    [source appendLine:@"  vColor = aColor * uAlpha;"];
     if (hasTexture) [source appendLine:@"  vTexCoords  = aTexCoords;"];
     
     [source appendString:@"}"];
@@ -194,14 +166,13 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     return source;
 }
 
-- (NSString *)fragmentShaderForTexture:(SPTexture *)texture useTinting:(BOOL)useTinting
+- (NSString *)fragmentShaderForTexture:(SPTexture *)texture
 {
     BOOL hasTexture = texture != nil;
     NSMutableString *source = [NSMutableString string];
     
     // variables
     
-    if (useTinting)
         [source appendLine:@"varying lowp vec4 vColor;"];
     
     if (hasTexture)
@@ -216,10 +187,7 @@ static NSString *getProgramName(BOOL hasTexture, BOOL useTinting)
     
     if (hasTexture)
     {
-        if (useTinting)
-            [source appendLine:@"  gl_FragColor = texture2D(uTexture, vTexCoords) * vColor;"];
-        else
-            [source appendLine:@"  gl_FragColor = texture2D(uTexture, vTexCoords);"];
+        [source appendLine:@"  gl_FragColor = texture2D(uTexture, vTexCoords) * vColor;"];
     }
     else
         [source appendLine:@"  gl_FragColor = vColor;"];

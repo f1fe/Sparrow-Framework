@@ -151,16 +151,16 @@
     quad.rotation = PI_HALF;
     SPRectangle *bounds = quad.bounds;
     
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.height), @"wrong bounds.height: %f", bounds.height);
+    XCTAssertTrue(SPIsFloatEqual(-30, bounds.x), @"wrong bounds.x: %f", bounds.x);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.y), @"wrong bounds.y: %f", bounds.y);
+    XCTAssertTrue(SPIsFloatEqual(20, bounds.width), @"wrong bounds.width: %f", bounds.width);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.height), @"wrong bounds.height: %f", bounds.height);
     
     bounds = [quad boundsInSpace:quad];
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(0, bounds.x), @"wrong inner bounds.x: %f", bounds.x);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(0, bounds.y), @"wrong inner bounds.y: %f", bounds.y);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(10, bounds.width), @"wrong inner bounds.width: %f", bounds.width);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(20, bounds.height), @"wrong innter bounds.height: %f", bounds.height);
+    XCTAssertTrue(SPIsFloatEqual(0, bounds.x), @"wrong inner bounds.x: %f", bounds.x);
+    XCTAssertTrue(SPIsFloatEqual(0, bounds.y), @"wrong inner bounds.y: %f", bounds.y);
+    XCTAssertTrue(SPIsFloatEqual(10, bounds.width), @"wrong inner bounds.width: %f", bounds.width);
+    XCTAssertTrue(SPIsFloatEqual(20, bounds.height), @"wrong innter bounds.height: %f", bounds.height);
 }
 
 - (void)testZeroSize
@@ -289,24 +289,24 @@
 {
     SPQuad *quad = [SPQuad quadWithWidth:100 height:100];
     
-    quad.rotation = SP_D2R(400);  
-    XCTAssertEqualWithAccuracy(SP_D2R(40.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(220); 
-    XCTAssertEqualWithAccuracy(SP_D2R(-140.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(180);  
-    XCTAssertEqualWithAccuracy(SP_D2R(180.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-90); 
-    XCTAssertEqualWithAccuracy(SP_D2R(-90.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-179); 
-    XCTAssertEqualWithAccuracy(SP_D2R(-179.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-180); 
-    XCTAssertEqualWithAccuracy(SP_D2R(-180.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-181); 
-    XCTAssertEqualWithAccuracy(SP_D2R(179.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-300); 
-    XCTAssertEqualWithAccuracy(SP_D2R(60.0f), quad.rotation, E, @"wrong angle");    
-    quad.rotation = SP_D2R(-370); 
-    XCTAssertEqualWithAccuracy(SP_D2R(-10.0f), quad.rotation, E, @"wrong angle");
+    quad.rotation = SPDegreesToRadians(400);  
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(40.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(220); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(-140.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(180);  
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(180.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-90); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(-90.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-179); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(-179.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-180); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(-180.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-181); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(179.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-300); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(60.0f), quad.rotation, E, @"wrong angle");    
+    quad.rotation = SPDegreesToRadians(-370); 
+    XCTAssertEqualWithAccuracy(SPDegreesToRadians(-10.0f), quad.rotation, E, @"wrong angle");
 }
 
 - (void)testPivotPoint
@@ -333,8 +333,8 @@
     
     XCTAssertTrue([sprite.bounds isEqualToRectangle:quad.bounds], @"Bounds are not equal (pivot)");
     
-    sprite.rotation = SP_D2R(45);
-    quad.rotation = SP_D2R(45);
+    sprite.rotation = SPDegreesToRadians(45);
+    quad.rotation = SPDegreesToRadians(45);
     
     XCTAssertTrue([sprite.bounds isEqualToRectangle:quad.bounds], @"Bounds are not equal (pivot, rotation)");
 

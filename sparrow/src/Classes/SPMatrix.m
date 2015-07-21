@@ -86,9 +86,9 @@ static inline void setValues(SPMatrix *matrix, float a, float b, float c, float 
     else if (!matrix) return NO;
     else
     {
-        return SP_IS_FLOAT_EQUAL(_a, matrix->_a) && SP_IS_FLOAT_EQUAL(_b, matrix->_b) &&
-               SP_IS_FLOAT_EQUAL(_c, matrix->_c) && SP_IS_FLOAT_EQUAL(_d, matrix->_d) &&
-               SP_IS_FLOAT_EQUAL(_tx, matrix->_tx) && SP_IS_FLOAT_EQUAL(_ty, matrix->_ty);
+        return SPIsFloatEqual(_a, matrix->_a) && SPIsFloatEqual(_b, matrix->_b) &&
+               SPIsFloatEqual(_c, matrix->_c) && SPIsFloatEqual(_d, matrix->_d) &&
+               SPIsFloatEqual(_tx, matrix->_tx) && SPIsFloatEqual(_ty, matrix->_ty);
     }
 }
 

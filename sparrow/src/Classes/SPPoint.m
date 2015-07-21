@@ -118,8 +118,8 @@
     else if (!point) return NO;
     else
     {
-        return SP_IS_FLOAT_EQUAL(_x, point->_x) &&
-               SP_IS_FLOAT_EQUAL(_y, point->_y);
+        return SPIsFloatEqual(_x, point->_x) &&
+               SPIsFloatEqual(_y, point->_y);
     }
 }
 

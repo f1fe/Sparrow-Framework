@@ -49,11 +49,6 @@
 /// Indicates if the color values of texture and vertices use premultiplied alpha. (Default: `NO`)
 @property (nonatomic, assign) BOOL premultipliedAlpha;
 
-/// Indicates if the colors of the vertices should tint the texture colors. The iPad 1 profits
-/// immensely from the very simple fragment shader that can be used when tinting is deactivated.
-/// Note that an alpha value different to "1" will still force tinting to be used. (Default: `YES`)
-@property (nonatomic, assign) BOOL useTinting;
-
 /// The alpha value with which every vertex color will be multiplied. (Default: 1)
 @property (nonatomic, assign) float alpha;
 

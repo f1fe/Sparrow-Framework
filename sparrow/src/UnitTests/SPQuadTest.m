@@ -23,58 +23,58 @@
     float height = 20.0f;
     float x = 3;
     float y = 2;
-    
+
     SPQuad *quad = [[SPQuad alloc] initWithWidth:width height:height];
-    quad.x = x; 
+    quad.x = x;
     quad.y = y;
-    
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(x, quad.x), @"wrong x");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(y, quad.y), @"wrong y");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(width, quad.width), @"wrong width");
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(height, quad.height), @"wrong height");
+
+    XCTAssertTrue(SPIsFloatEqual(x, quad.x), @"wrong x");
+    XCTAssertTrue(SPIsFloatEqual(y, quad.y), @"wrong y");
+    XCTAssertTrue(SPIsFloatEqual(width, quad.width), @"wrong width");
+    XCTAssertTrue(SPIsFloatEqual(height, quad.height), @"wrong height");
 }
 
 - (void)testWidthAfterRotation
 {
     float width = 30;
     float height = 40;
-    float angle = SP_D2R(45.0f);
+    float angle = SPDegreesToRadians(45.0f);
     SPQuad *quad = [[SPQuad alloc] initWithWidth:width height:height];
     quad.rotation = angle;
 
     float expectedWidth = cosf(angle) * (width + height);
-    XCTAssertTrue(SP_IS_FLOAT_EQUAL(expectedWidth, quad.width), @"wrong width: %f", quad.width);
+    XCTAssertTrue(SPIsFloatEqual(expectedWidth, quad.width), @"wrong width: %f", quad.width);
 }
 
 - (void)testVertexColorAndAlpha
 {
     SPQuad *quad = [[SPQuad alloc] initWithWidth:100 height:100 color:0xffffff premultipliedAlpha:NO];
-    
+
     [quad setColor:0xff0000 ofVertex:0];
     [quad setColor:0x00ff00 ofVertex:1];
     [quad setColor:0x0000ff ofVertex:2];
     [quad setColor:0xff00ff ofVertex:3];
-    
+
     XCTAssertEqual((uint)0xff0000, [quad colorOfVertex:0], @"wrong vertex color");
     XCTAssertEqual((uint)0x00ff00, [quad colorOfVertex:1], @"wrong vertex color");
     XCTAssertEqual((uint)0x0000ff, [quad colorOfVertex:2], @"wrong vertex color");
     XCTAssertEqual((uint)0xff00ff, [quad colorOfVertex:3], @"wrong vertex color");
-    
+
     XCTAssertEqual(1.0f, [quad alphaOfVertex:0], @"wrong vertex alpha");
     XCTAssertEqual(1.0f, [quad alphaOfVertex:1], @"wrong vertex alpha");
     XCTAssertEqual(1.0f, [quad alphaOfVertex:2], @"wrong vertex alpha");
     XCTAssertEqual(1.0f, [quad alphaOfVertex:3], @"wrong vertex alpha");
-    
+
     [quad setAlpha:0.2 ofVertex:0];
     [quad setAlpha:0.4 ofVertex:1];
     [quad setAlpha:0.6 ofVertex:2];
     [quad setAlpha:0.8 ofVertex:3];
-    
+
     XCTAssertEqual((uint)0xff0000, [quad colorOfVertex:0], @"wrong vertex color");
     XCTAssertEqual((uint)0x00ff00, [quad colorOfVertex:1], @"wrong vertex color");
     XCTAssertEqual((uint)0x0000ff, [quad colorOfVertex:2], @"wrong vertex color");
     XCTAssertEqual((uint)0xff00ff, [quad colorOfVertex:3], @"wrong vertex color");
-    
+
     XCTAssertEqual(0.2f, [quad alphaOfVertex:0], @"wrong vertex alpha");
     XCTAssertEqual(0.4f, [quad alphaOfVertex:1], @"wrong vertex alpha");
     XCTAssertEqual(0.6f, [quad alphaOfVertex:2], @"wrong vertex alpha");
@@ -85,17 +85,17 @@
 {
     SPQuad *quad = [SPQuad quadWithWidth:100 height:100];
     XCTAssertFalse(quad.tinted, @"default quad shouldn't be tinted");
-    
+
     quad.alpha = 0.99f;
     XCTAssertTrue(quad.tinted, @"non-opaque quad should be tinted");
-    
+
     quad.alpha = 1.0f;
     [quad setColor:0xff0000 ofVertex:0];
     XCTAssertTrue(quad.tinted, @"partially colored quad should be tinted");
-    
+
     [quad setColor:0xffffff ofVertex:0];
     XCTAssertFalse(quad.tinted, @"reset quad shouldn't be tinted");
-    
+
     [quad setAlpha:0.99f ofVertex:0];
     XCTAssertTrue(quad.tinted, @"partially non-opaque quad should be tinted");
 }

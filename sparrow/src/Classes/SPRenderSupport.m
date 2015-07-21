@@ -225,9 +225,8 @@
     uint blendMode = _stateStackTop->_blendMode;
     SPMatrix *modelviewMatrix = _stateStackTop->_modelviewMatrix;
 
-    if ([_quadBatchTop isStateChangeWithTinted:quad.tinted texture:quad.texture alpha:alpha
-                            premultipliedAlpha:quad.premultipliedAlpha blendMode:blendMode
-                                      numQuads:1])
+    if ([_quadBatchTop isStateChangeWithTexture: quad.texture premultipliedAlpha:quad.premultipliedAlpha
+                                      blendMode:blendMode numQuads:1])
     {
         [self finishQuadBatch]; // next batch
     }
