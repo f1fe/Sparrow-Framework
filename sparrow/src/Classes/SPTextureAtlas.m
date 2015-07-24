@@ -251,7 +251,7 @@
             NSString *filename = [attributes valueForKey:@"imagePath"];
             NSString *textureFolder = [path stringByDeletingLastPathComponent];
             NSString *texturePath = [textureFolder stringByAppendingPathComponent:filename];
-            _atlasTexture = [[SPTexture alloc] initWithContentsOfFile:texturePath];
+            _atlasTexture = [[SPTexture alloc] initWithContentsOfFile:texturePath generateMipmaps: YES];
         }
     }];
 
