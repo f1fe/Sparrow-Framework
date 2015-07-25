@@ -241,8 +241,10 @@
     int attribColor     = _baseEffect.attribColor;
     int attribTexCoords = _baseEffect.attribTexCoords;
     
-    glBindVertexArrayOES(_vertexArrayObjectName);
-    if( _needToCompleteVAOState ) {
+    if( _texture ) {
+        glBindVertexArrayOES(_vertexArrayObjectName);
+    }
+    if( _needToCompleteVAOState || !_texture ) {
         glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferName);
         glEnableVertexAttribArray(attribPosition);
@@ -267,7 +269,9 @@
     }
     int numIndices = _numQuads * 6;
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
-    glBindVertexArrayOES(0);
+    if( _texture ) {
+        glBindVertexArrayOES(0);
+    }
 }
 
 #pragma mark Compilation Methods
@@ -384,17 +388,21 @@
     int numIndices = numVertices / 4 * 6;
     if (numVertices == 0) return;
 
-    glGenVertexArraysOES(1, &_vertexArrayObjectName);
-    glBindVertexArrayOES(_vertexArrayObjectName);
+    if( _texture ) {
+        glGenVertexArraysOES(1, &_vertexArrayObjectName);
+        glBindVertexArrayOES(_vertexArrayObjectName);
+    }
     glGenBuffers(1, &_vertexBufferName);
     glGenBuffers(1, &_indexBufferName);
 
-    if (!_vertexBufferName || !_indexBufferName || !_vertexArrayObjectName )
+    if (!_vertexBufferName || !_indexBufferName || (_texture && !_vertexArrayObjectName) )
         [NSException raise:SPExceptionOperationFailed format:@"could not create vertex buffers"];
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferName);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * numIndices, _indexData, GL_STATIC_DRAW);
-    glBindVertexArrayOES(0);
+    if( _texture ) {
+        glBindVertexArrayOES(0);
+    }
     
     _syncRequired = YES;
     _needToCompleteVAOState = YES;
@@ -427,11 +435,17 @@
 
     // don't use 'glBufferSubData'! It's much slower than uploading
     // everything via 'glBufferData', at least on the iPad 1.
-    glBindVertexArrayOES(_vertexArrayObjectName);
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(SPVertex) * _vertexData.numVertices,
-                 _vertexData.vertices, GL_STATIC_DRAW);
-    glBindVertexArrayOES(0);
+    if( _texture ) {
+        glBindVertexArrayOES(_vertexArrayObjectName);
+        glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SPVertex) * _vertexData.numVertices,
+                     _vertexData.vertices, GL_STATIC_DRAW);
+        glBindVertexArrayOES(0);
+    } else {
+        glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SPVertex) * _vertexData.numVertices,
+                     _vertexData.vertices, GL_STATIC_DRAW);
+    }
     _syncRequired = NO;
 }
 
