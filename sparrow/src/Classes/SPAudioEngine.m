@@ -143,7 +143,8 @@ static NSString * audioSessionCategoryFromSPAudioSessionCategory( SPAudioSession
     audioEngine -> audioSessionCategory = category;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     NSError *audioError = nil;
-    BOOL success = [audioSession setCategory: audioSessionCategoryFromSPAudioSessionCategory(category)
+    NSString *audioCategory = audioSessionCategoryFromSPAudioSessionCategory(category);
+    BOOL success = [audioSession setCategory: audioCategory
                                        error: &audioError];
     if( audioError ) {
         NSLog(@"Failed to initialize audio session:%@", [audioError localizedDescription] );

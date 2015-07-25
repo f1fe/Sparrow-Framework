@@ -243,34 +243,39 @@
     
     if( _texture ) {
         glBindVertexArrayOES(_vertexArrayObjectName);
-    }
-    if( _needToCompleteVAOState || !_texture ) {
+        if( _needToCompleteVAOState ) {
+            glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferName);
+
+            glEnableVertexAttribArray(attribPosition);
+            glEnableVertexAttribArray(attribColor);
+            glEnableVertexAttribArray(attribTexCoords);
+            
+            
+            glVertexAttribPointer(attribPosition, 2, GL_FLOAT, GL_FALSE, sizeof(SPVertex),
+                                  (void *)(offsetof(SPVertex, position)));
+            glVertexAttribPointer(attribColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(SPVertex),
+                                  (void *)(offsetof(SPVertex, color)));
+            glVertexAttribPointer(attribTexCoords, 2, GL_FLOAT, GL_FALSE, sizeof(SPVertex),
+                                      (void *)(offsetof(SPVertex, texCoords)));
+            _needToCompleteVAOState = NO;
+        }
+        int numIndices = _numQuads * 6;
+        glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+        glBindVertexArrayOES(0);
+    } else {
         glBindBuffer(GL_ARRAY_BUFFER, _vertexBufferName);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferName);
         glEnableVertexAttribArray(attribPosition);
         glEnableVertexAttribArray(attribColor);
-        
-        if (_texture)
-            glEnableVertexAttribArray(attribTexCoords);
-        
-        
         glVertexAttribPointer(attribPosition, 2, GL_FLOAT, GL_FALSE, sizeof(SPVertex),
                               (void *)(offsetof(SPVertex, position)));
         
         glVertexAttribPointer(attribColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(SPVertex),
                               (void *)(offsetof(SPVertex, color)));
         
-        if (_texture)
-        {
-            glVertexAttribPointer(attribTexCoords, 2, GL_FLOAT, GL_FALSE, sizeof(SPVertex),
-                                  (void *)(offsetof(SPVertex, texCoords)));
-        }
-        _needToCompleteVAOState = NO;
-    }
-    int numIndices = _numQuads * 6;
-    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
-    if( _texture ) {
-        glBindVertexArrayOES(0);
+        int numIndices = _numQuads * 6;
+        glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
     }
 }
 
@@ -400,12 +405,12 @@
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBufferName);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * numIndices, _indexData, GL_STATIC_DRAW);
-    if( _texture ) {
-        glBindVertexArrayOES(0);
-    }
     
     _syncRequired = YES;
     _needToCompleteVAOState = YES;
+    if( _texture ) {
+        glBindVertexArrayOES(0);
+    }
 }
 
 - (void)destroyBuffers
