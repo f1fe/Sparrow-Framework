@@ -10,6 +10,7 @@
 //
 
 #import <Sparrow/SPOpenGL.h>
+#import <GLKit/GLKMathTypes.h>
 
 const char* sglGetErrorString(uint error)
 {
@@ -31,6 +32,8 @@ const char* sglGetErrorString(uint error)
 /** --------------------------------------------------------------------------------------------- */
 
 #if SP_ENABLE_GL_STATE_CACHE
+
+#include "SPMatrix.h"
 
 // undefine previous 'shims'
 #undef glActiveTexture
@@ -79,6 +82,12 @@ struct SGLStateCache
     int  blendDst;
     int  viewport[4];
     int  scissor[4];
+    GLint  uniformAlpha;
+    GLfloat  uniformAlphaW;
+    GLuint uniformMvpMatrix;
+    struct SGL_SPMatrix mvpMatrix;
+    uint clearColor;
+    float clearColorAlpha;
 };
 
 // global cache
@@ -561,6 +570,47 @@ void sglViewport(GLint x, GLint y, GLsizei width, GLsizei height)
         currentStateCache->viewport[3] = height;
         
         glViewport(x, y, width, height);
+    }
+}
+
+void sglUniform4fAlpha(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
+    SGLStateCacheRef currentStateCache = __getCurrentStateCache();
+    if( currentStateCache -> uniformAlpha != location ) {
+        currentStateCache -> uniformAlpha = location;
+        glUniform4f(location, x, y, z, w);
+    } else {
+        if( SPIsFloatNotEqual( currentStateCache -> uniformAlphaW, w ) ) {
+            currentStateCache -> uniformAlphaW = w;
+            glUniform4f(location, x, y, z, w);
+        }
+    }
+}
+
+void sglUniformMatrix4fvMvpMatrix(GLint location, SPMatrix *matrix) {
+    SGLStateCacheRef currentStateCache = __getCurrentStateCache();
+    if( currentStateCache -> uniformMvpMatrix != location ) {
+        currentStateCache -> uniformMvpMatrix = location;
+        GLKMatrix4 glkMvpMatrix = [matrix convertToGLKMatrix4];
+        glUniformMatrix4fv( location, 1, NO, glkMvpMatrix.m);
+    } else {
+        if( ![matrix isEqualToSGLMatrix: &(currentStateCache -> mvpMatrix)] ) {
+            [matrix copyToSGLMatrix: &(currentStateCache -> mvpMatrix)];
+            GLKMatrix4 glkMvpMatrix = [matrix convertToGLKMatrix4];
+            glUniformMatrix4fv( location, 1, NO, glkMvpMatrix.m);
+        }
+    }
+}
+
+void sglClearColor(uint color, float alpha) {
+    SGLStateCacheRef currentStateCache = __getCurrentStateCache();
+    if( currentStateCache -> clearColor != color ||
+        SPIsFloatNotEqual(currentStateCache -> clearColorAlpha, alpha) ) {
+        currentStateCache -> clearColor = color;
+        currentStateCache -> clearColorAlpha = alpha;
+        float red   = SPColorGetRed(color)   / 255.0f;
+        float green = SPColorGetGreen(color) / 255.0f;
+        float blue  = SPColorGetBlue(color)  / 255.0f;
+        glClearColor(red, green, blue, alpha);
     }
 }
 

@@ -57,6 +57,7 @@ SP_EXTERN const char* sglGetErrorString(uint error);
 
 /// OpenGL remappings
 #if SP_ENABLE_GL_STATE_CACHE
+    @class SPMatrix;
     #undef  glBindVertexArray
     #undef  glDeleteVertexArrays
 
@@ -99,4 +100,7 @@ SP_EXTERN const char* sglGetErrorString(uint error);
     SP_EXTERN void                      sglScissor(GLint x, GLint y, GLsizei width, GLsizei height);
     SP_EXTERN void                      sglUseProgram(GLuint program);
     SP_EXTERN void                      sglViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+    SP_EXTERN void                      sglUniform4fAlpha(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+    SP_EXTERN void                      sglUniformMatrix4fvMvpMatrix(GLint location, SPMatrix *matrix);
+    SP_EXTERN void                      sglClearColor(uint color, float alpha);
 #endif

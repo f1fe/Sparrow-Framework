@@ -165,11 +165,15 @@
 
 + (void)clearWithColor:(uint)color alpha:(float)alpha;
 {
+#if SP_ENABLE_GL_STATE_CACHE
+    sglClearColor(color, alpha);
+#else
     float red   = SPColorGetRed(color)   / 255.0f;
     float green = SPColorGetGreen(color) / 255.0f;
     float blue  = SPColorGetBlue(color)  / 255.0f;
 
     glClearColor(red, green, blue, alpha);
+#endif
     glClear(GL_COLOR_BUFFER_BIT);
 }
 

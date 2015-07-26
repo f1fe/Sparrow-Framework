@@ -80,6 +80,16 @@ static inline void setValues(SPMatrix *matrix, float a, float b, float c, float 
     _tx = tx; _ty = ty;
 }
 
+- (void)copyToSGLMatrix:(struct SGL_SPMatrix *)other
+{
+    other -> a = _a;
+    other -> b = _b;
+    other -> c = _c;
+    other -> d = _d;
+    other -> tx = _tx;
+    other -> ty = _ty;
+}
+
 - (BOOL)isEqualToMatrix:(SPMatrix *)matrix
 {
     if (matrix == self) return YES;
@@ -90,6 +100,13 @@ static inline void setValues(SPMatrix *matrix, float a, float b, float c, float 
                SPIsFloatEqual(_c, matrix->_c) && SPIsFloatEqual(_d, matrix->_d) &&
                SPIsFloatEqual(_tx, matrix->_tx) && SPIsFloatEqual(_ty, matrix->_ty);
     }
+}
+
+- (BOOL)isEqualToSGLMatrix:(struct SGL_SPMatrix *)other
+{
+    return SPIsFloatEqual(_a, other -> a) && SPIsFloatEqual(_b, other -> b) &&
+           SPIsFloatEqual(_c, other -> c) && SPIsFloatEqual(_d, other -> d) &&
+           SPIsFloatEqual(_tx, other -> tx) && SPIsFloatEqual(_ty, other -> ty);
 }
 
 - (void)appendMatrix:(SPMatrix *)lhs

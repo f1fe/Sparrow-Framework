@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import <GLKit/GLKMath.h>
+#import <OpenGLES/gltypes.h>
 #import <Sparrow/SPPoolObject.h>
 
 @class SPPoint;
@@ -27,6 +28,13 @@
  	|0 0  1| 
  
 ------------------------------------------------------------------------------------------------- */
+
+
+struct SGL_SPMatrix
+{
+    GLfloat a, b, c, d;
+    GLfloat tx, ty;
+};
 
 @interface SPMatrix : SPPoolObject <NSCopying>
 {
@@ -67,8 +75,14 @@
 /// Sets all components simultaneously.
 - (void)setA:(float)a b:(float)b c:(float)c d:(float)d tx:(float)tx ty:(float)ty;
 
+/// Copies self to the struct form
+- (void)copyToSGLMatrix: (struct SGL_SPMatrix *)other;
+
 /// Compares two matrices.
 - (BOOL)isEqualToMatrix:(SPMatrix *)other;
+
+/// Compares self to the struct form
+- (BOOL)isEqualToSGLMatrix: (struct SGL_SPMatrix *)other;
 
 /// Appends the matrix by multiplying another matrix by the current matrix.
 - (void)appendMatrix:(SPMatrix *)lhs;

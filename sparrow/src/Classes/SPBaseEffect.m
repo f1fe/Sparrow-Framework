@@ -95,7 +95,14 @@
         _uMvpMatrix = [_program uniformByName:@"uMvpMatrix"];
         _uAlpha     = [_program uniformByName:@"uAlpha"];
     }
+#if SP_ENABLE_GL_STATE_CACHE
+
+    glUseProgram(_program.name);
+    sglUniformMatrix4fvMvpMatrix(_uMvpMatrix, _mvpMatrix);
     
+    if (_premultipliedAlpha) sglUniform4fAlpha(_uAlpha, _alpha, _alpha, _alpha, _alpha);
+    else                     sglUniform4fAlpha(_uAlpha, 1.0f, 1.0f, 1.0f, _alpha);
+#else 
     GLKMatrix4 glkMvpMatrix = [_mvpMatrix convertToGLKMatrix4];
     
     glUseProgram(_program.name);
@@ -103,7 +110,8 @@
     
     if (_premultipliedAlpha) glUniform4f(_uAlpha, _alpha, _alpha, _alpha, _alpha);
     else                     glUniform4f(_uAlpha, 1.0f, 1.0f, 1.0f, _alpha);
-    
+
+#endif
     if (hasTexture)
     {
         glActiveTexture(GL_TEXTURE0);
