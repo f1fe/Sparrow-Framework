@@ -83,7 +83,7 @@ struct SGLStateCache
     int  viewport[4];
     int  scissor[4];
     GLint  uniformAlpha;
-    GLfloat  uniformAlphaW;
+    GLfloat  alphaW;
     GLuint uniformMvpMatrix;
     struct SGL_SPMatrix mvpMatrix;
     uint clearColor;
@@ -553,6 +553,8 @@ void sglUseProgram(GLuint program)
     {
         currentStateCache->program = program;
         glUseProgram(program);
+        currentStateCache -> uniformAlpha = INVALID_STATE;
+        currentStateCache -> uniformMvpMatrix = INVALID_STATE;
     }
 }
 
@@ -579,8 +581,8 @@ void sglUniform4fAlpha(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat 
         currentStateCache -> uniformAlpha = location;
         glUniform4f(location, x, y, z, w);
     } else {
-        if( SPIsFloatNotEqual( currentStateCache -> uniformAlphaW, w ) ) {
-            currentStateCache -> uniformAlphaW = w;
+        if( SPIsFloatNotEqual( currentStateCache -> alphaW, w ) ) {
+            currentStateCache -> alphaW = w;
             glUniform4f(location, x, y, z, w);
         }
     }
