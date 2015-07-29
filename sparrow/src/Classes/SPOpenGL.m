@@ -552,9 +552,9 @@ void sglUseProgram(GLuint program)
     if (program != currentStateCache->program)
     {
         currentStateCache->program = program;
-        glUseProgram(program);
         currentStateCache -> uniformAlpha = INVALID_STATE;
         currentStateCache -> uniformMvpMatrix = INVALID_STATE;
+        glUseProgram(program);
     }
 }
 
@@ -579,6 +579,7 @@ void sglUniform4fAlpha(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat 
     SGLStateCacheRef currentStateCache = __getCurrentStateCache();
     if( currentStateCache -> uniformAlpha != location ) {
         currentStateCache -> uniformAlpha = location;
+        currentStateCache -> alphaW = w;
         glUniform4f(location, x, y, z, w);
     } else {
         if( SPIsFloatNotEqual( currentStateCache -> alphaW, w ) ) {
@@ -592,6 +593,7 @@ void sglUniformMatrix4fvMvpMatrix(GLint location, SPMatrix *matrix) {
     SGLStateCacheRef currentStateCache = __getCurrentStateCache();
     if( currentStateCache -> uniformMvpMatrix != location ) {
         currentStateCache -> uniformMvpMatrix = location;
+        [matrix copyToSGLMatrix: &(currentStateCache -> mvpMatrix)];
         GLKMatrix4 glkMvpMatrix = [matrix convertToGLKMatrix4];
         glUniformMatrix4fv( location, 1, NO, glkMvpMatrix.m);
     } else {
