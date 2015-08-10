@@ -398,8 +398,11 @@ void sglDeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
 void sglDeleteProgram(GLuint program)
 {
     SGLStateCacheRef currentStateCache = __getCurrentStateCache();
-    if (currentStateCache->program == program)
+    if (currentStateCache->program == program) {
         currentStateCache->program = INVALID_STATE;
+        currentStateCache->uniformAlpha = INVALID_STATE;
+        currentStateCache->uniformMvpMatrix = INVALID_STATE;
+    }
 
     glDeleteProgram(program);
 }
