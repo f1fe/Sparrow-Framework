@@ -261,6 +261,22 @@
     [self dispatchEventWithType:type];
 }
 
+#pragma mark Utility
+
+- (void)setX:(float)x y:(float)y
+{
+    _x = x;
+    _y = y;
+    _orientationChanged = YES;
+}
+
+- (void)setPivotX:(float)pivotX pivotY:(float)pivotY
+{
+    _pivotX = pivotX;
+    _pivotY = pivotY;
+    _orientationChanged = YES;
+}
+
 #pragma mark SPEventDispatcher
 
 - (void)dispatchEvent:(SPEvent *)event

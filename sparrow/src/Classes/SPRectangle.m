@@ -127,6 +127,12 @@
     _height = height;
 }
 
+- (void)setX:(float)x y:(float)y
+{
+    _x = x;
+    _y = y;
+}
+
 - (void)setEmpty
 {
     _x = _y = _width = _height = 0;

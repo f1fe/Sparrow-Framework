@@ -116,6 +116,12 @@
 /// Creates an event and dispatches it on all children (recursively).
 - (void)broadcastEventWithType:(NSString *)type;
 
+/// Assigns to both x and y
+- (void)setX: (float)x y: (float)y;
+
+/// Assigns to both pivot x and pivot y
+- (void)setPivotX: (float)pivotX pivotY: (float)pivotY;
+
 /// ----------------
 /// @name Properties
 /// ----------------
