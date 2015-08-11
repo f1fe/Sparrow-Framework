@@ -23,6 +23,7 @@
 #import <Sparrow/SPRenderSupport.h>
 #import <Sparrow/SPTexture.h>
 #import <Sparrow/SPVertexData.h>
+#import <Sparrow/SPQuadBatchStack.h>
 
 #pragma mark - SPRenderState
 
@@ -89,10 +90,9 @@
     int _stateStackIndex;
     int _stateStackSize;
 
-    NSMutableArray *_quadBatches;
-    SPQuadBatch *_quadBatchTop;
-    int _quadBatchIndex;
-    int _quadBatchSize;
+    SPQuadBatchStack *_texturedQuadBatchStack;
+    SPQuadBatchStack *_nonTexturedQuadBatchStack;
+    SPQuadBatchStack *_primaryQuadBatchStack;
 
     NSMutableArray *_clipRectStack;
     int _clipRectStackSize;
@@ -112,11 +112,10 @@
         _stateStackSize = 1;
         _stateStackTop = _stateStack[0];
 
-        _quadBatches = [[NSMutableArray alloc] initWithObjects:[SPQuadBatch quadBatch], nil];
-        _quadBatchIndex = 0;
-        _quadBatchSize = 1;
-        _quadBatchTop = _quadBatches[0];
-
+        _texturedQuadBatchStack = [SPQuadBatchStack newStack];
+        _nonTexturedQuadBatchStack = [SPQuadBatchStack newStack];
+        _primaryQuadBatchStack = _texturedQuadBatchStack;
+        
         _clipRectStack = [[NSMutableArray alloc] init];
         _clipRectStackSize = 0;
 
@@ -130,7 +129,8 @@
     [_projectionMatrix release];
     [_mvpMatrix release];
     [_stateStack release];
-    [_quadBatches release];
+    [_texturedQuadBatchStack release];
+    [_nonTexturedQuadBatchStack release];
     [_clipRectStack release];
     [super dealloc];
 }
@@ -139,13 +139,8 @@
 
 - (void)purgeBuffers
 {
-    [_quadBatches removeAllObjects];
-
-    _quadBatchTop = [SPQuadBatch quadBatch];
-    [_quadBatches addObject:_quadBatchTop];
-
-    _quadBatchIndex = 0;
-    _quadBatchSize = 1;
+    [_texturedQuadBatchStack purgeBuffers];
+    [_nonTexturedQuadBatchStack purgeBuffers];
 }
 
 - (void)clear
@@ -203,24 +198,19 @@
 - (void)nextFrame
 {
     [self trimQuadBatches];
+    [_nonTexturedQuadBatchStack prepForNextFrame];
+    [_texturedQuadBatchStack prepForNextFrame];
 
     _clipRectStackSize = 0;
     _stateStackIndex = 0;
-    _quadBatchIndex = 0;
     _numDrawCalls = 0;
-    _quadBatchTop = _quadBatches[0];
     _stateStackTop = _stateStack[0];
 }
 
 - (void)trimQuadBatches
 {
-    int numUsedBatches = _quadBatchIndex + 1;
-    if (_quadBatchSize >= 16 && _quadBatchSize > 2 * numUsedBatches)
-    {
-        int numToRemove = _quadBatchSize - numUsedBatches;
-        [_quadBatches removeObjectsInRange:(NSRange){ _quadBatchSize-numToRemove-1, numToRemove }];
-        _quadBatchSize = (int)_quadBatches.count;
-    }
+    [_texturedQuadBatchStack trimQuadBatches];
+    [_nonTexturedQuadBatchStack trimQuadBatches];
 }
 
 - (void)batchQuad:(SPQuad *)quad
@@ -229,31 +219,33 @@
     uint blendMode = _stateStackTop->_blendMode;
     SPMatrix *modelviewMatrix = _stateStackTop->_modelviewMatrix;
 
-    if ([_quadBatchTop isStateChangeWithTexture: quad.texture premultipliedAlpha:quad.premultipliedAlpha
-                                      blendMode:blendMode numQuads:1])
+    SPTexture *quadTexture = quad.texture;
+    if( quadTexture ) {
+        if( _primaryQuadBatchStack != _texturedQuadBatchStack ) {
+            [_primaryQuadBatchStack finishQuadBatch: _projectionMatrix];
+            _primaryQuadBatchStack = _texturedQuadBatchStack;
+        }
+    } else {
+        if( _primaryQuadBatchStack != _nonTexturedQuadBatchStack ) {
+            [_primaryQuadBatchStack finishQuadBatch: _projectionMatrix];
+            _primaryQuadBatchStack = _nonTexturedQuadBatchStack;
+        }
+    }
+    
+    if ([_primaryQuadBatchStack -> _quadBatchTop isStateChangeWithTexture: quadTexture
+                                                       premultipliedAlpha: quad.premultipliedAlpha
+                                                                blendMode: blendMode
+                                                                 numQuads:1])
     {
         [self finishQuadBatch]; // next batch
     }
 
-    [_quadBatchTop addQuad:quad alpha:alpha blendMode:blendMode matrix:modelviewMatrix];
+    [_primaryQuadBatchStack -> _quadBatchTop addQuad:quad alpha:alpha blendMode:blendMode matrix:modelviewMatrix];
 }
 
 - (void)finishQuadBatch
 {
-    if (_quadBatchTop.numQuads)
-    {
-        [_quadBatchTop renderWithMvpMatrix:_projectionMatrix];
-        [_quadBatchTop reset];
-
-        if (_quadBatchSize == _quadBatchIndex + 1)
-        {
-            [_quadBatches addObject:[SPQuadBatch quadBatch]];
-            ++_quadBatchSize;
-        }
-
-        ++_numDrawCalls;
-        _quadBatchTop = _quadBatches[++_quadBatchIndex];
-    }
+    [_primaryQuadBatchStack finishQuadBatch: _projectionMatrix];
 }
 
 #pragma mark State Manipulation

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B97D0F21B7998B10092EA12 /* SPQuadBatchStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B97D0F01B7998B10092EA12 /* SPQuadBatchStack.h */; };
+		6B97D0F31B7998B10092EA12 /* SPQuadBatchStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B97D0F11B7998B10092EA12 /* SPQuadBatchStack.m */; };
 		872F5C3D1880C9E30016071B /* SPFragmentFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 872F5C3B1880C9E30016071B /* SPFragmentFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		872F5C3E1880C9E30016071B /* SPFragmentFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 872F5C3C1880C9E30016071B /* SPFragmentFilter.m */; };
 		872F5C471880E2B50016071B /* SPBlurFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 872F5C451880E2B50016071B /* SPBlurFilter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -197,6 +199,8 @@
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		6B97D0F01B7998B10092EA12 /* SPQuadBatchStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPQuadBatchStack.h; sourceTree = "<group>"; };
+		6B97D0F11B7998B10092EA12 /* SPQuadBatchStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPQuadBatchStack.m; sourceTree = "<group>"; };
 		872F5C3B1880C9E30016071B /* SPFragmentFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPFragmentFilter.h; sourceTree = "<group>"; };
 		872F5C3C1880C9E30016071B /* SPFragmentFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPFragmentFilter.m; sourceTree = "<group>"; };
 		872F5C451880E2B50016071B /* SPBlurFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPBlurFilter.h; sourceTree = "<group>"; };
@@ -617,6 +621,8 @@
 				DE2ED8560F6D54900012B6BA /* SPQuad.m */,
 				DEC87D0516E0CDD80050EA95 /* SPQuadBatch.h */,
 				DEC87D0616E0CDD80050EA95 /* SPQuadBatch.m */,
+				6B97D0F01B7998B10092EA12 /* SPQuadBatchStack.h */,
+				6B97D0F11B7998B10092EA12 /* SPQuadBatchStack.m */,
 				DE4D6AEA0F75913D0045CBF7 /* SPSprite.h */,
 				DE4D6AEB0F75913D0045CBF7 /* SPSprite.m */,
 				DE2ED8580F6D54AC0012B6BA /* SPStage.h */,
@@ -830,6 +836,7 @@
 				DE611386134F8F8300AB742E /* SPStage.h in Headers */,
 				DE0BA5D81703513D00637533 /* SPStatsDisplay.h in Headers */,
 				DE61138E134F8FA600AB742E /* SPSubTexture.h in Headers */,
+				6B97D0F21B7998B10092EA12 /* SPQuadBatchStack.h in Headers */,
 				DE611380134F8F8300AB742E /* SPTextField.h in Headers */,
 				DE61138C134F8FA600AB742E /* SPTexture.h in Headers */,
 				DEC734811386BC1400234D95 /* SPTextureAtlas.h in Headers */,
@@ -1062,6 +1069,7 @@
 				DE33072612D2EBCD009CC5E7 /* SPUtils.m in Sources */,
 				DE8E6A8316B430C4007EE8BA /* SPViewController.m in Sources */,
 				DE2A27A6184129D80056839C /* SPPVRData.m in Sources */,
+				6B97D0F31B7998B10092EA12 /* SPQuadBatchStack.m in Sources */,
 				DE85778F16B58E4B00725EC0 /* SparrowClass.m in Sources */,
 				87C7DCF118061354005E8CFB /* SPMacros.m in Sources */,
 				DEAAF3D816BC0D21004EB9D5 /* SPResizeEvent.m in Sources */,
