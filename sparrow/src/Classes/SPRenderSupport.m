@@ -83,8 +83,11 @@
 {
     SPMatrix *_projectionMatrix;
     SPMatrix *_mvpMatrix;
-    int _numDrawCalls;
 
+#if SP_ENABLE_DRAW_COUNT
+    int _numDrawCalls;
+#endif
+    
     NSMutableArray *_stateStack;
     SPRenderState *_stateStackTop;
     int _stateStackIndex;
@@ -179,10 +182,14 @@
     return error;
 }
 
+#if SP_ENABLE_DRAW_COUNT
+
 - (void)addDrawCalls:(int)count
 {
     _numDrawCalls += count;
 }
+
+#endif
 
 - (void)setupOrthographicProjectionWithLeft:(float)left right:(float)right
                                         top:(float)top bottom:(float)bottom;
@@ -203,7 +210,9 @@
 
     _clipRectStackSize = 0;
     _stateStackIndex = 0;
+#if SP_ENABLE_DRAW_COUNT
     _numDrawCalls = 0;
+#endif
     _stateStackTop = _stateStack[0];
 }
 
@@ -246,6 +255,9 @@
 - (void)finishQuadBatch
 {
     [_primaryQuadBatchStack finishQuadBatch: _projectionMatrix];
+#if SP_ENABLE_DRAW_COUNT
+    ++_numDrawCalls;
+#endif
 }
 
 #pragma mark State Manipulation

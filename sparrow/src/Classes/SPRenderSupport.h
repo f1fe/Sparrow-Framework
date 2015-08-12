@@ -31,6 +31,8 @@
  
 ------------------------------------------------------------------------------------------------- */
 
+#define SP_ENABLE_DRAW_COUNT 1
+
 @interface SPRenderSupport : NSObject
 
 /// -------------
@@ -67,9 +69,13 @@
 /// Checks for an OpenGL error. If there is one, it is logged an the error code is returned.
 + (uint)checkForOpenGLError;
 
+#if SP_ENABLE_DRAW_COUNT
+
 /// Raises the number of draw calls by a specific value. Call this method in custom render methods
 /// to keep the statistics display in sync.
 - (void)addDrawCalls:(int)count;
+
+#endif
 
 /// Sets up the projection matrix for ortographic 2D rendering.
 - (void)setupOrthographicProjectionWithLeft:(float)left right:(float)right
@@ -133,7 +139,11 @@
 /// If you set a new target, it is immediately activated.
 @property (nonatomic, strong) SPTexture *renderTarget;
 
+#if SP_ENABLE_DRAW_COUNT
+
 /// Indicates the number of OpenGL ES draw calls since the last call to `nextFrame`.
 @property (nonatomic, readonly) int numDrawCalls;
+
+#endif
 
 @end

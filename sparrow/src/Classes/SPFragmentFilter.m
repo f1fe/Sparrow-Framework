@@ -319,7 +319,9 @@
     [self updatePassTexturesWithWidth:boundsPOT.width height:boundsPOT.height scale:scale];
 
     [support finishQuadBatch];
+#if SP_ENABLE_DRAW_COUNT
     [support addDrawCalls:_numPasses];
+#endif
     [support pushStateWithMatrix:[SPMatrix matrixWithIdentity] alpha:1.0f blendMode:SPBlendModeAuto];
 
     // save original projection matrix and render target

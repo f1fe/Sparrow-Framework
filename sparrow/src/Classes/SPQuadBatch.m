@@ -213,7 +213,9 @@
     if (_numQuads)
     {
         [support finishQuadBatch];
+#if SP_ENABLE_DRAW_COUNT
         [support addDrawCalls:1];
+#endif
         [self renderWithMvpMatrix:support.mvpMatrix alpha:support.alpha blendMode:support.blendMode];
     }
 }

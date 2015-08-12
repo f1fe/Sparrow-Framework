@@ -51,7 +51,9 @@
     SPTouchProcessor *_touchProcessor;
     SPRenderSupport *_support;
     SPRootCreatedBlock _onRootCreated;
+#if SP_ENABLE_DRAW_COUNT
     SPStatsDisplay *_statsDisplay;
+#endif
     NSMutableDictionary *_programs;
     
     dispatch_queue_t _resourceQueue;
@@ -62,7 +64,9 @@
     float _viewScaleFactor;
     BOOL _supportHighResolutions;
     BOOL _doubleOnPad;
+#if SP_ENABLE_DRAW_COUNT
     BOOL _showStats;
+#endif
 }
 
 @dynamic view;
@@ -105,7 +109,9 @@
     [_touchProcessor release];
     [_support release];
     [_onRootCreated release];
+#if SP_ENABLE_DRAW_COUNT
     [_statsDisplay release];
+#endif
     [_programs release];
 
     [SPContext setCurrentContext:nil];
@@ -141,9 +147,10 @@
     self.view.opaque = YES;
     self.view.clearsContextBeforeDrawing = NO;
     self.view.context = _context.nativeContext;
-
+#if SP_ENABLE_DRAW_COUNT
     // the stats display could not be shown before now, since it requires a context.
     self.showStats = _showStats;
+#endif
 }
 
 - (void)viewDidLoad
@@ -239,9 +246,10 @@
             [_stage render:_support];
             [_support finishQuadBatch];
 
+#if SP_ENABLE_DRAW_COUNT
             if (_statsDisplay)
                 _statsDisplay.numDrawCalls = _support.numDrawCalls - 2; // stats display requires 2 itself
-
+#endif
           #if DEBUG
             [SPRenderSupport checkForOpenGLError];
           #endif
@@ -405,6 +413,7 @@
 
 - (void)setShowStats:(BOOL)showStats
 {
+#if SP_ENABLE_DRAW_COUNT
     if (showStats && !_statsDisplay && _context)
     {
         _statsDisplay = [[SPStatsDisplay alloc] init];
@@ -413,6 +422,7 @@
 
     _showStats = showStats;
     _statsDisplay.visible = showStats;
+#endif
 }
 
 #pragma mark Private

@@ -125,8 +125,9 @@
     if (_flattenedContents)
     {
         [support finishQuadBatch];
+#if SP_ENABLE_DRAW_COUNT
         [support addDrawCalls:(int)_flattenedContents.count];
-
+#endif
         SPMatrix *mvpMatrix = support.mvpMatrix;
         float alpha = support.alpha;
         uint supportBlendMode = support.blendMode;
